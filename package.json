@@ -1,0 +1,19 @@
+{
+  "name": "berlin-clock",
+  "version": "0.0.0",
+  "description": "",
+  "scripts": {
+    "eslint": "eslint .",
+    "test": "mocha"
+  },
+  "author": "Jonathan Taylor",
+  "license": "MIT",
+  "dependencies": {
+    "moment": "^2.24.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^5.16.0",
+    "mocha": "^6.1.4"
+  }
+}
