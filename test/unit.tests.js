@@ -14,7 +14,7 @@ const zeroWith = overrides => ({
   ...overrides
 })
 
-describe('berlin-clock tests', () => {
+describe('Berlin Clock unit tests', () => {
 
   it('handles 00:00:00 correctly', () => {
     const actual = toBerlinClock('00:00:00')
