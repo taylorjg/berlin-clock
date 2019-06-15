@@ -10,16 +10,31 @@
 
 <body>
   <div class="container">
-    <div cass="row">
-      <div class="version pull-right">
-        (version: <%= htmlWebpackPlugin.options.version %>)
+    <div class="row">
+      <div class="col-md-12">
+        <div class="version pull-right">
+          (version: <%= htmlWebpackPlugin.options.version %>)
+        </div>
       </div>
     </div>
-    <div cass="row">
-      <hr />
+    <div class="row">
+      <div class="col-md-12">
+        <hr />
+      </div>
     </div>
-    <div cass="row">
-      <span id="time"></span>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="centred-content">
+          <svg class="berlin-clock"></svg>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="centred-content">
+          <span class="text-clock" id="time"></span>
+        </div>
+      </div>
     </div>
   </div>
 </body>
