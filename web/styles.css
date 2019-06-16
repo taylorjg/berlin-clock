@@ -10,11 +10,12 @@
   align-items: center;
 }
 
-.berlin-clock {
+#berlin-clock {
   background-color: aliceblue;
-  height: 50vh;
+  width: 40vw;
+  height: 80vh;
 }
 
-.text-clock {
+#text-clock {
   margin-top: 10px;
 }
