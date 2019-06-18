@@ -28,16 +28,43 @@ const drawBerlinClockFramework = () => {
   drawBerlinClockStem()
 }
 
-const drawBerlinClockStem = () => {
+const drawBerlinClockBeacon = () => {
   const w = berlinClockElement.scrollWidth
-  const rect = createSvgElement('rect', {
-    x: w / 2 - 20,
-    y: 400,
-    width: 40,
-    height: 100,
+  const r1 = (18 / 54 * w) / 2
+  const r2 = r1 - (1.5 / 54 * w)
+  const d1 = `
+    M${w / 2},${0}
+    A${r1},${r1},0,1,1,${w / 2 - 0.001},${0}
+    M${w / 2},${r1 - r2}
+    A${r2},${r2},0,1,1,${w / 2 - 0.001},${r1 - r2}
+  `
+  const path1 = createSvgElement('path', {
+    d: d1,
+    fill: 'silver',
+    'fill-rule': 'evenodd'
+  })
+  berlinClockElement.appendChild(path1)
+  const cx = w / 2
+  const cy = r1
+  const angle1 = Math.PI / 180 * 60
+  const angle2 = Math.PI / 180 * 120
+  const x1 = cx + r1 * Math.cos(angle1)
+  const y1 = cy + r1 * Math.sin(angle1)
+  const x2 = cx + r1 * Math.cos(angle2)
+  const y2 = (18 / 54 * w) + (2 / 54 * w)
+  const r = 5
+  const d2 = `
+    M${x1},${y1}
+    A${r},${r},0,0,0,${x1},${y2}
+    L${x2},${y2}
+    A${r},${r},0,0,0,${x2},${y1}
+    Z
+  `
+  const path2 = createSvgElement('path', {
+    d: d2,
     fill: 'silver'
   })
-  berlinClockElement.appendChild(rect)
+  berlinClockElement.appendChild(path2)
 }
 
 const drawBerlinClockRows = () => {
@@ -52,14 +79,15 @@ const drawBerlinClockRows = () => {
 
 const drawBerlinClockRow = (row, numSegments) => {
   const w = berlinClockElement.scrollWidth
-  const h1 = 60 + w / 8 * row // TODO: add constant
-  const h2 = h1 + w / 8
+  const beaconBottom = (18 / 54 * w) + (2 / 54 * w)
+  const h1 = beaconBottom + ((11 / 54 * w) + (3 / 54 * w)) * (row - 1)
+  const h2 = h1 + (11 / 54 * w)
   const tl = { x: 0, y: h1 }
   const tr = { x: w, y: h1 }
   const br = { x: w, y: h2 }
   const bl = { x: 0, y: h2 }
-  const dx = 10 // TODO: add constant
-  const dy = 10 // TODO: add constant
+  const dx = 10
+  const dy = 10
   const outline = `
     M${tl.x},${tl.y + dy}
     A${dx},${dy},0,0,1,${tl.x + dx},${tl.y}
@@ -69,9 +97,9 @@ const drawBerlinClockRow = (row, numSegments) => {
     A${dx},${dy},0,0,1,${br.x - dx},${br.y}
     L${bl.x + dx},${bl.y}
     A${dx},${dy},0,0,1,${bl.x},${bl.y - dy}
-    L${tl.x},${tl.y - dy}
+    Z
   `
-  const bw = 7 // TODO: add constant
+  const bw = 1.5 / 54 * w
   const rw = (w - (numSegments * bw + bw)) / numSegments
   const rh = h2 - h1 - 2 * bw
   const firstSegmentIndex = 0
@@ -129,12 +157,12 @@ const RIGHT_SPACER = Symbol('RIGHT_SPACER')
 
 const drawBerlinClockSpacer = (row, position) => {
   const w = berlinClockElement.scrollWidth
-  const dx = w / 8 // TODO: add constant
-  const x1 = position === LEFT_SPACER ? dx : 5 * dx
-  const y1 = row * 80 // TODO: add constant
-  const x2 = x1 + 2 * dx
-  const y2 = y1 + 20 // TODO: add constant
-  const r = 5 // TODO: add constant
+  const x1 = position === LEFT_SPACER ? 7 / 54 * w : 33 / 54 * w
+  const beaconBottom = (18 / 54 * w) + (2 / 54 * w)
+  const y1 = beaconBottom + (11 / 54 * w) * row + (3 / 54 * w) * (row - 1) - 3
+  const x2 = x1 + (13 / 54 * w)
+  const y2 = y1 + (3 / 54 * w) + 4
+  const r = 5
   const d = `
     M${x1},${y1}
     A${r},${r},0,0,1,${x1},${y2}
@@ -149,43 +177,20 @@ const drawBerlinClockSpacer = (row, position) => {
   berlinClockElement.appendChild(path)
 }
 
-const drawBerlinClockBeacon = () => {
+const drawBerlinClockStem = () => {
   const w = berlinClockElement.scrollWidth
-  const r1 = w / 10 // TODO: add constant
-  const r2 = w / 12 // TODO: add constant
-  const d1 = `
-    M${w / 2},${0}
-    A${r1},${r1},0,1,1,${w / 2 - 0.001},${0}
-    M${w / 2},${r1 - r2}
-    A${r2},${r2},0,1,1,${w / 2 - 0.001},${r1 - r2}
-  `
-  const path1 = createSvgElement('path', {
-    d: d1,
-    fill: 'silver',
-    'fill-rule': 'evenodd'
-  })
-  berlinClockElement.appendChild(path1)
-  const cx = w / 2
-  const cy = r1
-  const angle1 = Math.PI / 180 * 55
-  const angle2 = Math.PI / 180 * 125
-  const x1 = cx + r1 * Math.cos(angle1)
-  const y1 = cy + r1 * Math.sin(angle1)
-  const x2 = cx + r1 * Math.cos(angle2)
-  const y2 = y1 + (r1 - r2) * 2
-  const r = 5 // TODO: add constant
-  const d2 = `
-    M${x1},${y1}
-    A${r},${r},0,0,0,${x1},${y2}
-    L${x2},${y2}
-    A${r},${r},0,0,0,${x2},${y1}
-    Z
-  `
-  const path2 = createSvgElement('path', {
-    d: d2,
+  const h = berlinClockElement.scrollHeight
+  const beaconBottom = (18 / 54 * w) + (2 / 54 * w)
+  const y = beaconBottom + (11 / 54 * w) * 4 + (3 / 54 * w) * 3 - 3
+  const rw = 8 / 54 * w
+  const rect = createSvgElement('rect', {
+    x: w / 2 - (rw / 2),
+    y,
+    width: rw,
+    height: h - y,
     fill: 'silver'
   })
-  berlinClockElement.appendChild(path2)
+  berlinClockElement.appendChild(rect)
 }
 
 const drawBerlinClockLights = () => {
