@@ -15,8 +15,6 @@ const updateTime = () => {
 }
 requestAnimationFrame(updateTime)
 
-const normalisePathData = d => d.replace(/\s+/g, ' ').trim()
-
 const createSvgElement = (elementName, additionalAttributes = {}) => {
   const element = document.createElementNS('http://www.w3.org/2000/svg', elementName)
   for (const [name, value] of Object.entries(additionalAttributes)) {
@@ -24,6 +22,14 @@ const createSvgElement = (elementName, additionalAttributes = {}) => {
   }
   return element
 }
+
+const normalisePathDataWhitespace = d => d.replace(/\s+/g, ' ').trim()
+
+const createSvgPathElement = (d, additionalAttributes) =>
+  createSvgElement('path', {
+    d: normalisePathDataWhitespace(d),
+    ...additionalAttributes
+  })
 
 const svgWidth = berlinClockElement.scrollWidth
 const svgHeight = berlinClockElement.scrollHeight
@@ -45,19 +51,22 @@ const drawBerlinClockFramework = () => {
   drawBerlinClockStem()
 }
 
+const makeBeaconCutoutPathData = () => {
+  const cutoutRadius = beaconRadius - borderWidth
+  return `
+    M${svgWidth / 2},${borderWidth}
+    a${cutoutRadius},${cutoutRadius},0,1,1,${-0.001},${0}
+  `
+}
+
 const drawBerlinClockBeacon = () => {
   const outline = `
     M${svgWidth / 2},${0}
     a${beaconRadius},${beaconRadius},0,1,1,${-0.001},${0}
   `
-  const cutoutRadius = beaconRadius - borderWidth
-  const cutout = `
-    M${svgWidth / 2},${borderWidth}
-    a${cutoutRadius},${cutoutRadius},0,1,1,${-0.001},${0}
-  `
+  const cutout = makeBeaconCutoutPathData()
   const d = [outline, cutout].join(' ')
-  const path = createSvgElement('path', {
-    d: normalisePathData(d),
+  const path = createSvgPathElement(d, {
     fill: 'silver',
     'fill-rule': 'evenodd'
   })
@@ -80,8 +89,7 @@ const drawBerlinClockBeaconCollar = () => {
     a${r},${r},0,0,1,${0},${-collarHeight}
     z
   `
-  const path = createSvgElement('path', {
-    d: normalisePathData(d),
+  const path = createSvgPathElement(d, {
     fill: 'silver'
   })
   berlinClockElement.appendChild(path)
@@ -151,8 +159,7 @@ const drawBerlinClockRow = (row, numSegments) => {
     }
   })
   const d = [outline, ...cutouts].join(' ')
-  const path = createSvgElement('path', {
-    d: normalisePathData(d),
+  const path = createSvgPathElement(d, {
     fill: 'silver',
     'fill-rule': 'evenodd'
   })
@@ -178,8 +185,7 @@ const drawBerlinClockRowSpacer = (row, position) => {
     a${r},${r},0,0,1,${0},${-rowSpacerHeight}
     z
   `
-  const path = createSvgElement('path', {
-    d: normalisePathData(d),
+  const path = createSvgPathElement(d, {
     fill: 'silver'
   })
   berlinClockElement.appendChild(path)
@@ -197,7 +203,17 @@ const drawBerlinClockStem = () => {
   berlinClockElement.appendChild(rect)
 }
 
-const drawBerlinClockLights = () => {
+const drawBerlinClockLights = berlinClockData => {
+  const lightElements = berlinClockElement.querySelectorAll('[data-light]')
+  for (const lightElement of lightElements) {
+    berlinClockElement.removeChild(lightElement)
+  }
+  const beaconLightPathData = makeBeaconCutoutPathData()
+  const beaconLight = createSvgPathElement(beaconLightPathData, {
+    fill: berlinClockData.seconds ? 'orange' : 'transparent',
+    'data-light': true
+  })
+  berlinClockElement.appendChild(beaconLight)
 }
 
 drawBerlinClockFramework()
