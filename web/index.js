@@ -25,17 +25,18 @@ const createSvgElement = (elementName, additionalAttributes = {}) => {
   return element
 }
 
-const w = berlinClockElement.scrollWidth
-const h = berlinClockElement.scrollHeight
-const borderWidth = 1.5 / 54 * w
-const beaconRadius = 9 / 54 * w
+const svgWidth = berlinClockElement.scrollWidth
+const svgHeight = berlinClockElement.scrollHeight
+const borderWidth = 1.5 / 54 * svgWidth
+const beaconRadius = 9 / 54 * svgWidth
 const beaconHeight = beaconRadius * 2 + borderWidth
-const rowHeight = 11 / 54 * w
-const spacerWidth = 13 / 54 * w
-const spacerHeight = 3 / 54 * w
-const leftSpacerX = 7 / 54 * w
-const rightSpacerX = 33 / 54 * w
-const stemWidth = 8 / 54 * w
+const rowWidth = svgWidth
+const rowHeight = 11 / 54 * svgWidth
+const rowSpacerWidth = 13 / 54 * svgWidth
+const rowSpacerHeight = 3 / 54 * svgWidth
+const leftRowSpacerX = 7 / 54 * svgWidth
+const rightRowSpacerX = 33 / 54 * svgWidth
+const stemWidth = 8 / 54 * svgWidth
 
 const drawBerlinClockFramework = () => {
   drawBerlinClockBeacon()
@@ -46,12 +47,12 @@ const drawBerlinClockFramework = () => {
 
 const drawBerlinClockBeacon = () => {
   const outline = `
-    M${w / 2},${0}
+    M${svgWidth / 2},${0}
     a${beaconRadius},${beaconRadius},0,1,1,${-0.001},${0}
   `
   const cutoutRadius = beaconRadius - borderWidth
   const cutout = `
-    M${w / 2},${borderWidth}
+    M${svgWidth / 2},${borderWidth}
     a${cutoutRadius},${cutoutRadius},0,1,1,${-0.001},${0}
   `
   const d = [outline, cutout].join(' ')
@@ -64,7 +65,7 @@ const drawBerlinClockBeacon = () => {
 }
 
 const drawBerlinClockBeaconCollar = () => {
-  const cx = w / 2
+  const cx = svgWidth / 2
   const cy = beaconRadius
   const angle = Math.PI / 180 * 120
   const x = cx + beaconRadius * Math.cos(angle)
@@ -88,30 +89,30 @@ const drawBerlinClockBeaconCollar = () => {
 
 const drawBerlinClockRows = () => {
   drawBerlinClockRow(1, 4)
-  drawBerlinClockSpacers(1)
+  drawBerlinClockRowSpacers(1)
   drawBerlinClockRow(2, 4)
-  drawBerlinClockSpacers(2)
+  drawBerlinClockRowSpacers(2)
   drawBerlinClockRow(3, 11)
-  drawBerlinClockSpacers(3)
+  drawBerlinClockRowSpacers(3)
   drawBerlinClockRow(4, 4)
 }
 
 const drawBerlinClockRow = (row, numSegments) => {
-  const h = beaconHeight + (rowHeight + spacerHeight) * (row - 1)
+  const h = beaconHeight + (rowHeight + rowSpacerHeight) * (row - 1)
   const dx = borderWidth
   const dy = borderWidth
   const outline = `
     M${0},${h + dy}
     a${dx},${dy},0,0,1,${dx},${-dy}
-    h${w - dx - dx}
+    h${rowWidth - dx - dx}
     a${dx},${dy},0,0,1,${dx},${dy}
     v${rowHeight - dy - dy}
     a${dx},${dy},0,0,1,${-dx},${dy}
-    h${-w + dx + dx}
+    h${-rowWidth + dx + dx}
     a${dx},${dy},0,0,1,${-dx},${-dy}
     z
   `
-  const rw = (w - (numSegments * borderWidth + borderWidth)) / numSegments
+  const rw = (rowWidth - (numSegments * borderWidth + borderWidth)) / numSegments
   const rh = rowHeight - 2 * borderWidth
   const firstSegmentIndex = 0
   const lastSegmentIndex = numSegments - 1
@@ -158,23 +159,23 @@ const drawBerlinClockRow = (row, numSegments) => {
   berlinClockElement.appendChild(path)
 }
 
-const drawBerlinClockSpacers = row => {
-  drawBerlinClockSpacer(row, LEFT_SPACER)
-  drawBerlinClockSpacer(row, RIGHT_SPACER)
+const drawBerlinClockRowSpacers = row => {
+  drawBerlinClockRowSpacer(row, LEFT_ROW_SPACER)
+  drawBerlinClockRowSpacer(row, RIGHT_ROW_SPACER)
 }
 
-const LEFT_SPACER = Symbol('LEFT_SPACER')
-const RIGHT_SPACER = Symbol('RIGHT_SPACER')
+const LEFT_ROW_SPACER = Symbol('LEFT_ROW_SPACER')
+const RIGHT_ROW_SPACER = Symbol('RIGHT_ROW_SPACER')
 
-const drawBerlinClockSpacer = (row, position) => {
-  const x = position === LEFT_SPACER ? leftSpacerX : rightSpacerX
-  const y = beaconHeight + rowHeight * row + spacerHeight * (row - 1)
+const drawBerlinClockRowSpacer = (row, position) => {
+  const x = position === LEFT_ROW_SPACER ? leftRowSpacerX : rightRowSpacerX
+  const y = beaconHeight + rowHeight * row + rowSpacerHeight * (row - 1)
   const r = 1
   const d = `
     M${x},${y}
-    a${r},${r},0,0,1,${0},${spacerHeight}
-    h${spacerWidth}
-    a${r},${r},0,0,1,${0},${-spacerHeight}
+    a${r},${r},0,0,1,${0},${rowSpacerHeight}
+    h${rowSpacerWidth}
+    a${r},${r},0,0,1,${0},${-rowSpacerHeight}
     z
   `
   const path = createSvgElement('path', {
@@ -185,13 +186,12 @@ const drawBerlinClockSpacer = (row, position) => {
 }
 
 const drawBerlinClockStem = () => {
-  const y = beaconHeight + rowHeight * 4 + spacerHeight * 3
-  const rw = stemWidth
+  const y = beaconHeight + rowHeight * 4 + rowSpacerHeight * 3
   const rect = createSvgElement('rect', {
-    x: w / 2 - (rw / 2),
+    x: svgWidth / 2 - stemWidth / 2,
     y,
-    width: rw,
-    height: h - y,
+    width: stemWidth,
+    height: Math.max(svgHeight - y, 0),
     fill: 'silver'
   })
   berlinClockElement.appendChild(rect)
