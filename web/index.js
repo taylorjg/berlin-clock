@@ -105,26 +105,16 @@ const drawBerlinClockRows = () => {
   drawBerlinClockRow(4, 4)
 }
 
-const drawBerlinClockRow = (row, numSegments) => {
+const makeRowSegmentCutoutsPathData = (row, numSegments) => {
   const h = beaconHeight + (rowHeight + rowSpacerHeight) * (row - 1)
   const dx = borderWidth
   const dy = borderWidth
-  const outline = `
-    M${0},${h + dy}
-    a${dx},${dy},0,0,1,${dx},${-dy}
-    h${rowWidth - dx - dx}
-    a${dx},${dy},0,0,1,${dx},${dy}
-    v${rowHeight - dy - dy}
-    a${dx},${dy},0,0,1,${-dx},${dy}
-    h${-rowWidth + dx + dx}
-    a${dx},${dy},0,0,1,${-dx},${-dy}
-    z
-  `
   const rw = (rowWidth - (numSegments * borderWidth + borderWidth)) / numSegments
   const rh = rowHeight - 2 * borderWidth
   const firstSegmentIndex = 0
   const lastSegmentIndex = numSegments - 1
-  const cutouts = Array.from(Array(numSegments).keys()).map(segmentIndex => {
+  const segmentIndices = Array.from(Array(numSegments).keys())
+  return segmentIndices.map(segmentIndex => {
     const x = (segmentIndex * borderWidth + borderWidth) + (segmentIndex * rw)
     const y = h + borderWidth
     switch (segmentIndex) {
@@ -158,6 +148,24 @@ const drawBerlinClockRow = (row, numSegments) => {
         `
     }
   })
+}
+
+const drawBerlinClockRow = (row, numSegments) => {
+  const h = beaconHeight + (rowHeight + rowSpacerHeight) * (row - 1)
+  const dx = borderWidth
+  const dy = borderWidth
+  const outline = `
+    M${0},${h + dy}
+    a${dx},${dy},0,0,1,${dx},${-dy}
+    h${rowWidth - dx - dx}
+    a${dx},${dy},0,0,1,${dx},${dy}
+    v${rowHeight - dy - dy}
+    a${dx},${dy},0,0,1,${-dx},${dy}
+    h${-rowWidth + dx + dx}
+    a${dx},${dy},0,0,1,${-dx},${-dy}
+    z
+  `
+  const cutouts = makeRowSegmentCutoutsPathData(row, numSegments)
   const d = [outline, ...cutouts].join(' ')
   const path = createSvgPathElement(d, {
     fill: 'silver',
@@ -204,16 +212,46 @@ const drawBerlinClockStem = () => {
 }
 
 const drawBerlinClockLights = berlinClockData => {
+
   const lightElements = berlinClockElement.querySelectorAll('[data-light]')
   for (const lightElement of lightElements) {
     berlinClockElement.removeChild(lightElement)
   }
-  const beaconLightPathData = makeBeaconCutoutPathData()
-  const beaconLight = createSvgPathElement(beaconLightPathData, {
-    fill: berlinClockData.seconds ? 'orange' : 'transparent',
+
+  const beaconCutout = makeBeaconCutoutPathData()
+  const beaconLight = createSvgPathElement(beaconCutout, {
+    fill: berlinClockData.seconds ? 'gold' : 'transparent',
     'data-light': true
   })
   berlinClockElement.appendChild(beaconLight)
+
+  const rowData = [
+    { row: 1, numSegments: 4 },
+    { row: 2, numSegments: 4 },
+    { row: 3, numSegments: 11 },
+    { row: 4, numSegments: 4 }
+  ]
+
+  for (const { row, numSegments } of rowData) {
+    const segmentCutouts = makeRowSegmentCutoutsPathData(row, numSegments)
+    const segmentIndices = Array.from(Array(numSegments).keys())
+    let arr
+    switch (row) {
+      case 1: arr = berlinClockData.fiveHours; break
+      case 2: arr = berlinClockData.oneHours; break
+      case 3: arr = berlinClockData.fiveMinutes; break
+      case 4: arr = berlinClockData.oneMinutes; break
+    }
+    for (const segmentIndex of segmentIndices) {
+      const segmentLight = createSvgPathElement(segmentCutouts[segmentIndex], {
+        fill: arr[segmentIndex]
+          ? (row !== 3 ? 'tomato' : ((segmentIndex + 1) % 3 === 0 ? 'tomato' : 'gold'))
+          : 'transparent',
+        'data-light': true
+      })
+      berlinClockElement.appendChild(segmentLight)
+    }
+  }
 }
 
 drawBerlinClockFramework()
