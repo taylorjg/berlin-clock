@@ -4,12 +4,16 @@
   "description": "",
   "scripts": {
     "eslint": "eslint .",
+    "build": "webpack",
     "test": "mocha",
-    "start:dev": "webpack-dev-server"
+    "start": "node server",
+    "start:dev": "webpack-dev-server",
+    "heroku-postbuild": "npm run build"
   },
   "author": "Jonathan Taylor",
   "license": "MIT",
   "dependencies": {
+    "express": "^4.17.1",
     "moment": "^2.24.0"
   },
   "devDependencies": {
