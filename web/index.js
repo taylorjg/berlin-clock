@@ -107,8 +107,8 @@ const drawBerlinClockRows = () => {
 
 const makeRowSegmentCutoutsPathData = (row, numSegments) => {
   const h = beaconHeight + (rowHeight + rowSpacerHeight) * (row - 1)
-  const dx = borderWidth
-  const dy = borderWidth
+  const dx = borderWidth / 2
+  const dy = borderWidth / 2
   const rw = (rowWidth - (numSegments * borderWidth + borderWidth)) / numSegments
   const rh = rowHeight - 2 * borderWidth
   const firstSegmentIndex = 0
